@@ -1,5 +1,8 @@
 <template>
-  <div>123</div>
+  <div>
+    
+    <router-link to='#'>点我啊</router-link>
+  </div>
 </template>
 
 <script>
