@@ -8,7 +8,7 @@ Vue.use(VueRouter)
 import login from '../views/login/login.vue'
 // 设置路由规则
 const routes=[{
-    path:'/login',
+    path:'/',
     component:login
 }]
 
