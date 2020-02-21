@@ -7,7 +7,7 @@
         <span></span>
         用户登陆
       </div>
-      <el-form ref="lorginForm" :model="form" label-width="48px" class="login_form" :rules="rules">
+      <el-form ref="lorginForm" :m；odel="form" label-width="48px" class="login_form" :rules="rules">
         <el-form-item prop="name">
           <el-input v-model="form.name" placeholder="请输入用户名" prefix-icon="el-icon-user" clearable></el-input>
         </el-form-item>
