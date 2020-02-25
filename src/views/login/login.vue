@@ -7,7 +7,8 @@
         <span></span>
         用户登陆
       </div>
-      <el-form ref="lorginForm" :m；odel="form" label-width="48px" class="login_form" :rules="rules">
+      <!-- 登陆表单 -->
+      <el-form ref="lorginForm" :model="form" label-width="48px" class="login_form" :rules="rules">
         <el-form-item prop="name">
           <el-input v-model="form.name" placeholder="请输入用户名" prefix-icon="el-icon-user" clearable></el-input>
         </el-form-item>
@@ -30,7 +31,7 @@
             </span>
           </el-col>
         </el-form-item>
-        <el-form-item prop='checked'>
+        <el-form-item prop="checked">
           <el-checkbox v-model="form.checked" class="login_agree">
             我已阅读
             <el-link type="primary">主要链接</el-link>和
@@ -43,40 +44,57 @@
             <el-button type="primary" @click="onSubmit" style="width:100%;margin:28px 0">登陆</el-button>
           </el-col>
           <el-col :span="24">
-            <el-button type="primary" @click="onSubmit" style="width:100%">注册</el-button>
+            <el-button type="primary" @click="goReg" style="width:100%">注册</el-button>
           </el-col>
         </el-form-item>
       </el-form>
     </div>
     <img src="../../assets/login_banner_ele.png" alt />
+    <!-- 注册模态框 -->
+    <reg ref="reg"></reg>
   </div>
 </template>
 
 <script>
+// 导入组件
+import reg from "./components/register.vue";
 export default {
+  // 注册组件
+  components: {
+    reg
+  },
   data() {
     return {
       form: {
         name: "",
         password: "",
         code: "",
-        checked:false
+        checked: false
       },
       rules: {
         name: [{ required: true, message: "用户名不能为空", trigger: "blur" }],
-        password: [{ required: true, message: "密码不能为空", trigger: "blur" }],
+        password: [
+          { required: true, message: "密码不能为空", trigger: "blur" }
+        ],
         code: [{ required: true, message: "验证码不能为空", trigger: "blur" }],
-        checked: [{ pattern:/true/, message: "验证码不能为空", trigger: "blur" }]
+        checked: [
+          { pattern: /true/, message: "请勾选我已阅读条款", trigger: "blur" }
+        ]
       }
     };
   },
   methods: {
+    // 登陆的点击事件
     onSubmit() {
-      this.$refs.lorginForm.validate(v=>{
-        if(v){
-          alert('全部通过')
+      this.$refs.lorginForm.validate(v => {
+        if (v) {
+          alert("全部通过");
         }
-      })
+      });
+    },
+    // 注册的点击事件
+    goReg() {
+      this.$refs.reg.dialogFormVisible = true;
     }
   }
 };
