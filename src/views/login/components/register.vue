@@ -49,7 +49,7 @@
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
-      <el-button @click="regClose" >取 消</el-button>
+      <el-button @click="regClose">取 消</el-button>
       <el-button type="primary" @click="doRegister">确 定</el-button>
     </div>
   </el-dialog>
@@ -57,7 +57,7 @@
 
 <script>
 // import axios from 'axios'
-import { sendSMS,register } from "@/api/register";
+import { sendSMS, register } from "@/api/register";
 // vue.cil中@做路径代表/src文件夹
 export default {
   data() {
@@ -128,34 +128,37 @@ export default {
     };
   },
   methods: {
-    regClose(){
-      this.$refs.regForm.resetFields()
-      this.dialogFormVisible = false
+    regClose() {
+      this.$refs.regForm.resetFields();
+      this.dialogFormVisible = false;
     },
     // 验证全部表单元素
     doRegister() {
       this.$refs.regForm.validate(v => {
         if (v) {
+          // console.log(this.form.avater);
+          // return;
           // alert("全部通过");
           register({
-            username:this.form.name,
-            phone:this.form.phone,
-            email:this.form.email,
-            avater:this.form.avater,
-            password:this.form.password,
-            rcode:this.form.rcode,
-          }).then(res=>{
-            if(res.data.code==200){
-              this.$message.success('注册成功')
+            username: this.form.name,
+            phone: this.form.phone,
+            email: this.form.email,
+            avatar: this.form.avater,
+            password: this.form.password,
+            rcode: this.form.rcode
+          }).then(res => {
+            if (res.data.code == 200) {
+              this.$message.success("注册成功");
               // 重置表单
-              this.$refs.regForm.resetFields()
-              this.imageUrl=''
+              this.$refs.regForm.resetFields();
+              this.imageUrl = "";
               this.dialogFormVisible = false;
-            }else{
-              this.$message.error(res.data.message)
+             
+              //   console.log(res);
+            } else {
+              this.$message.error(res.data.message);
             }
-          })
-          
+          });
         }
       });
     },
@@ -224,6 +227,7 @@ export default {
       // console.log(res);
       this.imageUrl = URL.createObjectURL(file.raw);
       this.form.avater = res.data.file_path;
+      // console.log(this.form.avater);
       // 对头像属性进行单独校验
       // window.console.log(this.form.avatar);
       this.$refs.regForm.validateField("avatar");

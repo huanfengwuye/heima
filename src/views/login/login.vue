@@ -27,7 +27,7 @@
           </el-col>
           <el-col :span="7">
             <span class="login_code">
-              <img src="./images/login_code.png" alt />
+              <img :src="loginImgcode" @click="changeCode" />
             </span>
           </el-col>
         </el-form-item>
@@ -58,6 +58,10 @@
 <script>
 // 导入组件
 import reg from "./components/register.vue";
+// 导入抽出的请求方法
+import { login } from '@/api/login.js';
+// 导入tonken方法
+import { setToken } from '@/utils/token.js';
 export default {
   // 注册组件
   components: {
@@ -65,6 +69,7 @@ export default {
   },
   data() {
     return {
+      loginImgcode:process.env.VUE_APP_URL+'/captcha?type=login',
       form: {
         name: "",
         password: "",
@@ -84,11 +89,31 @@ export default {
     };
   },
   methods: {
+    // 登陆验证码点击事件
+    changeCode(){
+      this.loginImgcode=process.env.VUE_APP_URL+'/captcha?type=login&t='+Date.now()
+    },
     // 登陆的点击事件
     onSubmit() {
       this.$refs.lorginForm.validate(v => {
         if (v) {
-          alert("全部通过");
+          // alert("全部通过");
+          login({
+            phone:this.form.name,
+            password:this.form.password,
+            code:this.form.code,
+          })
+          .then(res=>{
+            // console.log(res);
+            if(res.data.code==200){
+              this.$message.success('登陆成功')
+              this.$router.push('/index')
+              setToken(res.data.data.token)
+              // window.localStorage.setItem('token',res.data.data.token)
+            }else{
+              this.$message.error(res.data.message)
+            }
+          })
         }
       });
     },
