@@ -18,7 +18,7 @@
       <!-- 左侧部分 -->
       <el-aside width="auto" class="my_aside">
           <!-- 菜单 -->
-        <el-menu default-active="1" router class="el-menu-vertical-demo" :collapse="isCollapse">
+        <el-menu :default-active="indexOlder" router class="el-menu-vertical-demo" :collapse="isCollapse">
           <el-menu-item index="/index/chart">
             <i class="el-icon-time"></i>
             <span slot="title">数据概览</span>
@@ -50,24 +50,34 @@
 </template>
 
 <script>
-import { info, logout } from "@/api/index.js";
-// import { removeToken } from '@/utils/token.js'
+import {  logout } from "@/api/index.js";
+import { getToken,removeToken } from '@/utils/token.js'
 export default {
   data() {
     return {
-      avatar: "",
-      username: "",
+      indexOlder:this.$route.path,
+      avatar: this.$store.state.avatar,
+      username: this.$store.state.username,
       isCollapse: false
     };
   },
+  beforeCreate() {
+    if(getToken()==null){
+      this.$message.error('请先登录')
+      this.$router.push('/login')
+    }
+  },
   created() {
-    info().then(res => {
-      // console.log(res);
+    // console.log(this.indexOlder);
+    // info().then(res => {
+    //   // console.log(res);
+    //   if(res.data.code==200){
+    //     this.avatar = process.env.VUE_APP_URL + "/" + res.data.data.avatar;
+    //     this.username = res.data.data.username;
+    //     // console.log(this.avatar,this.username);
 
-      this.avatar = process.env.VUE_APP_URL + "/" + res.data.data.avatar;
-      this.username = res.data.data.username;
-      // console.log(this.avatar,this.username);
-    });
+    //   }
+    // });
   },
   methods: {
     // 退出按钮点击事件
@@ -83,7 +93,11 @@ export default {
             console.log(res);
             if (res.data.code == 200) {
               this.$message.success("退出成功");
+              // 清空vuex里的数据
+              this.$store.commit('changeusername',''),
+              this.$store.commit('changeavatar','')
             }
+            removeToken()
             this.$router.push("/login");
           });
         })

@@ -11,10 +11,15 @@ Vue.use(ElementUI);
 
 // 导入router
 import router from './router/index'
+// 导入vuex仓库实例
+import store from './store/index'
 Vue.config.productionTip = false
+// 导入全局过滤器
+import "./filters/filters"
 
 // 挂载到vue实例
 new Vue({
   router,
+  store,
   render: h => h(App),
 }).$mount('#app')

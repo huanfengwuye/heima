@@ -71,10 +71,10 @@ export default {
     return {
       loginImgcode:process.env.VUE_APP_URL+'/captcha?type=login',
       form: {
-        name: "",
-        password: "",
+        name: "18511111111",
+        password: "12345678",
         code: "",
-        checked: false
+        checked: true,
       },
       rules: {
         name: [{ required: true, message: "用户名不能为空", trigger: "blur" }],
