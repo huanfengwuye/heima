@@ -4,29 +4,29 @@
     <el-card class="box-card">
       <!-- 表单部分 -->
       <el-form :inline="true" :model="formInline" class="demo-form-inline" ref="formInline">
-        <el-form-item label="企业编号" prop="eid">
-          <el-input v-model="formInline.eid" placeholder="编号" class="short"></el-input>
+        <el-form-item label="用户名称" prop="username">
+          <el-input v-model="formInline.username" placeholder="用户名称" class="short"></el-input>
         </el-form-item>
-        <el-form-item label="企业名称" prop="name">
-          <el-input v-model="formInline.name" placeholder="名称" class="nomal"></el-input>
+        <el-form-item label="用户邮箱" prop="email">
+          <el-input v-model="formInline.email" placeholder="用户邮箱" class="nomal"></el-input>
         </el-form-item>
-        <el-form-item label="创建者" prop="username">
-          <el-input v-model="formInline.username" placeholder="创建人" class="short"></el-input>
+        <el-form-item label="角色" prop="role_id">
+          <el-select v-model="formInline.role_id" class="nomal">
+            <el-option label="管理员" value="2"></el-option>
+            <el-option label="老师" value="3"></el-option>
+            <el-option label="学生" value="4"></el-option>
+          </el-select>
         </el-form-item>
-        <el-form-item label="状态" prop="status">
+        <el-form-item label="请选择状态" prop="status">
           <el-select v-model="formInline.status" class="nomal">
             <el-option label="启用" value="1"></el-option>
             <el-option label="禁用" value="0"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="doSearch">查询</el-button>
+          <el-button type="primary" @click="doSearch">搜索</el-button>
           <el-button @click="clearSearch">清除</el-button>
-          <el-button
-            type="primary"
-            icon="el-icon-plus"
-            @click="add()"
-          >新增学科</el-button>
+          <el-button type="primary" icon="el-icon-plus" @click="add()">新增用户</el-button>
         </el-form-item>
       </el-form>
     </el-card>
@@ -35,12 +35,11 @@
       <!-- 表格部分 -->
       <el-table :data="tableData" style="width: 100%">
         <el-table-column type="index" label="序号" width="50"></el-table-column>
-        <el-table-column prop="eid" label="企业编号"></el-table-column>
-        <el-table-column prop="name" label="企业名称"></el-table-column>
-        <el-table-column prop="username" label="创建者"></el-table-column>
-        <el-table-column prop="create_time" label="创建日期">
-          <template slot-scope="scope">{{ scope.row.create_time | formateTime }}</template>
-        </el-table-column>
+        <el-table-column prop="username" label="用户名"></el-table-column>
+        <el-table-column prop="phone" label="电话"></el-table-column>
+        <el-table-column prop="email" label="邮箱"></el-table-column>
+        <el-table-column prop="role" label="角色"></el-table-column>
+        <el-table-column prop="remark" label="备注"></el-table-column>
         <el-table-column prop="status" label="状态">
           <template slot-scope="scope">
             <span v-if="scope.row.status===1">启用</span>
@@ -71,25 +70,17 @@
         :total="total"
       ></el-pagination>
     </el-card>
-    <!-- 新增弹窗 -->
-    <!-- <busAdd ref="add"></busAdd> -->
-    <!-- 编辑弹窗 -->
-    <!-- <busEdit ref="edit"></busEdit> -->
-    <!-- 弹窗 -->
-     <busDialog ref="busDialog"></busDialog>
+    <userDialog ref="userDialog"></userDialog>
   </div>
 </template>
 
 <script>
-// import busdalog from "./components/busAdd";
-// import busEdit from "./components/busEdit";
-import busDialog from "./components/busDialog";
-import { busList, statusRequest, busDel } from "@/api/business.js";
+import { userList, userremove,userStatus } from "@/api/user.js";
+import userDialog from "./components/userDagio"
+
 export default {
   components: {
-    // busAdd,
-    // busEdit
-    busDialog
+    userDialog
   },
   data() {
     return {
@@ -112,43 +103,8 @@ export default {
       oldItem: null
     };
   },
+
   methods: {
-    // 删除事件
-    doDel(data) {
-      busDel({
-        id: data.id
-      }).then(res => {
-        if (res.data.code == 200) {
-          this.$message.success("删除成功");
-          // 解决删除最后一条的刷新bug
-          if (this.tableData.length == 1) {
-            this.page--;
-          }
-          if (this.page == 0) {
-            this.page = 1;
-          }
-          this.getList();
-        } else {
-          this.$message.error(res.data.message);
-        }
-      });
-    },
-    // 新增事件
-    add(){
-      this.$refs.busDialog.isAdd=true
-      this.$refs.busDialog.dialogFormVisible=true
-    },
-    // 编辑事件
-    edit(data) {
-      // console.log(data);
-        this.$refs.busDialog.isAdd=false
-      this.$refs.busDialog.dialogFormVisible = true;
-      // 因为对象保存的是内存地址直接赋值会有bug，需要拷贝其数据新建一个对象在赋值
-      if (this.oldItem != data) {
-        this.$refs.busDialog.form = { ...data };
-        this.oldItem = data;
-      }
-    },
     // 清空搜索栏
     clearSearch() {
       // 重置表单
@@ -174,34 +130,70 @@ export default {
       this.getList();
       // console.log(`当前页: ${val}`);
     },
-    // 改变状态事件
-    changeStatus(item) {
-      statusRequest({
-        id: item.id
-      }).then(() => {
-        // 重新刷新表格
-        this.getList();
-      });
-    },
-    // 获取列表函数
+    // 重新获取列表
     getList() {
-      busList({
+      userList({
         page: this.page,
         limit: this.size,
-        // rid:this.formInline.rid,
-        // name:this.formInline.name,
-        // username:this.formInline.username,
-        // status:this.formInline.status,
-        //相当于...解构赋值
         ...this.formInline
       }).then(res => {
-        this.tableData = res.data.data.items;
-        this.total = res.data.data.pagination.total;
         // console.log(res);
+        (this.tableData = res.data.data.items),
+          (this.total = res.data.data.pagination.total);
       });
+    },
+    // 删除用户
+    doDel(data) {
+      userremove({
+        id: data.id
+      }).then(res => {
+        if (res.data.code == 200) {
+          this.$message.success("删除成功");
+          this.getList();
+        } else {
+          this.$message.error(res.data.message);
+        }
+      });
+    },
+    // 新增用户
+    add(){
+      this.$refs.userDialog.dialogFormVisible=true
+      this.$refs.userDialog.isAdd=true
+      this.$refs.userDialog.form={}
+    },
+    //编辑用户
+    edit(items){
+      this.$refs.userDialog.dialogFormVisible=true
+      this.$refs.userDialog.isAdd=false
+      if(this.oldItem!=items){
+        this.$refs.userDialog.form={...items}
+        this.oldItem=items
+      }
+    },
+    //改变用户状态
+    changeStatus(items){
+      userStatus({
+        id:items.id
+      }).then(res=>{
+        if(res.data.code==200){
+          this.$message.success('修改成功')
+          this.getList()
+        }else(
+          this.$message.success(res.data.message)
+
+        )
+      })
     }
   },
   created() {
+    //   userList({
+    //     page: this.page,
+    //     limit: this.size
+    //     }).then(res => {
+    //       // console.log(res);
+    //       (this.tableData = res.data.data.items),
+    //         (this.total = res.data.data.pagination.total);
+    //     });
     this.getList();
   }
 };

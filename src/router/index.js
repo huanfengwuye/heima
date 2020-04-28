@@ -10,7 +10,7 @@ Vue.use(VueRouter)
 // 准备组件
 import login from '../views/login/login.vue'
 import index from '../views/index/index.vue'
-import user from '../views/index/user/index.vue'
+import user from '../views/index/user/user.vue'
 import business from '../views/index/business/business.vue'
 import chart from '../views/index/chart/chart.vue'
 import question from '../views/index/question/question.vue'
